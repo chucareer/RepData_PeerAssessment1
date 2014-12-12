@@ -1,0 +1,126 @@
+# Peer-Assessment Assignment 1
+                       
+## Loading and Processing the data
+```{r loading data, echo=TRUE}
+setInternet2(TRUE)
+temp <- tempfile()
+download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", temp) 
+data <- read.csv(unz(temp, "activity.csv"))
+data$date <- as.Date(data$date)
+unlink(temp)
+```
+
+
+
+## Mean total number of steps taken per day
+### Here is a summary for total number of steps taken each day
+```{r, echo = TRUE}
+DailyTotalSteps <- aggregate(data$steps, list(data$date), sum)
+colnames(DailyTotalSteps) <- c("date", "steps")
+```
+
+### Histogram of the total number of steps taken each day
+```{r, echo = TRUE}
+barplot(DailyTotalSteps$steps, names.arg = DailyTotalSteps$date, 
+    xlab = "Date", ylab = "Steps",
+    main = "Total Number of Steps Taken Each Day", axis.lty = 1)
+```
+
+### Mean and median of step taken each day
+```{r, echo = FALSE}
+MeanValue <- mean(DailyTotalSteps$steps, na.rm = TRUE)
+MedianValue <- median(DailyTotalSteps$steps, na.rm = TRUE)
+```
+Mean and median total number of steps taken per day: `r as.integer(MeanValue)` and `r MedianValue`
+
+
+
+## Average daily activity pattern
+### Time series plot
+```{r, echo = TRUE}
+AverageSteps <- aggregate(steps~interval, data = data, FUN = "mean")
+plot(AverageSteps$interval, AverageSteps$steps, type = "l",
+    xlab = "5-minute interval", ylab = "Average nubmer of steps taken",
+    main = "Average number of steps taken by 5-minute interval")
+```
+
+### 5-minute interval with maximum number of steps
+```{r, echo = FALSE}
+Interval_maxvalue <- AverageSteps$interval[AverageSteps$steps == max(AverageSteps$steps)]
+```
+5-minute interval with maximum number of steps of average daily activity: `r Interval_maxvalue`
+
+
+
+## Imputing missing values
+### Total number of missing values in the dataset
+```{r, echo = FALSE}
+MissingCount <- sum(is.na(data$steps))
+```
+Total number of missing value in the dataset: `r MissingCount`
+
+### Imputing missing values with the mean for the 5-minute interval
+```{r, echo = FALSE}
+colnames(AverageSteps)[2] <- "AverageSteps"
+ImputData <- merge(data, AverageSteps, by.x = "interval", by.y = "interval")
+ImputData$steps[is.na(ImputData$steps)] <- ImputData$AverageSteps[is.na(ImputData$steps)]
+```
+
+### Histogram with imputing data
+```{r, echo = TRUE}
+ImputTotalSteps <- aggregate(steps~date, data = ImputData, FUN = "sum")
+barplot(ImputTotalSteps$steps, names.arg = ImputTotalSteps$date, 
+    xlab = "Date", ylab = "Steps",
+    main = "Total Number of Steps Taken Each Day after imputing", 
+    axis.lty = 1)
+```
+
+### Mean and median of step taken each day with imputing data
+```{r, echo = FALSE}
+ImputMeanValue <- mean(ImputTotalSteps$steps, na.rm = TRUE)
+ImputMedianValue <- median(ImputTotalSteps$steps, na.rm = TRUE)
+if(MeanValue > ImputMeanValue) {
+    different1 <- "Increase"
+    different2 <- "Yes"
+} else if(MeanValue <ImputMeanValue) {
+    different1 <- "Decrease"
+    different2 <- "Yes"
+} else {
+    different1 <- "Equal"
+    different2 <- "No"
+}
+if(MedianValue > ImputMedianValue) {
+    different3 <- "Increase"
+    different4 <- "Yes"
+} else if(MedianValue <ImputMedianValue) {
+    different3 <- "Decrease"
+    different4 <- "Yes"
+} else {
+    different3 <- "Equal"
+    different4 <- "No"
+}
+
+```
+Mean and median total number of steps taken per day: `r as.integer(ImputMeanValue)` and `r as.integer(ImputMedianValue)`
+
+Do these values different from the previous estimates: `r different2`
+
+What is the impact of imputing: 
+Mean Value `r different1` from `r as.integer(MeanValue)` to `r as.integer(ImputMeanValue)`
+Median Value `r different3` from `r MedianValue` to `r as.integer(ImputMedianValue)`
+
+## Differences in activity patterns between weekdays and weekends
+```{r, echo = TRUE}
+ImputData$weekday <- weekdays(ImputData$date) 
+ImputData$weekday[ImputData$weekday %in% c("Saturday", "Sunday")] <- "Weekend"
+ImputData$weekday[ImputData$weekday != "Weekend"] <- "Weekday"
+ImputData$weekday <- as.factor(ImputData$weekday)
+WeekdayData <- aggregate(steps~interval + weekday, data = ImputData, FUN = "mean")
+WeekdayData$steps <- format(WeekdayData$steps, scientific = FALSE) 
+library(lattice)
+xyplot(as.integer(steps) ~ interval | weekday, data = WeekdayData, layout = c(1, 2),
+       type = "l", xlab = "Interval", ylab = "Number of steps")
+
+```
+It is different in activity patterns between weekdays and weekends.
+
