@@ -13,7 +13,7 @@ unlink(temp)
 
 
 ## Mean total number of steps taken per day
-### Here is a summary for total number of steps taken each day
+### Summary for total number of steps taken each day
 ```{r, echo = TRUE}
 DailyTotalSteps <- aggregate(data$steps, list(data$date), sum)
 colnames(DailyTotalSteps) <- c("date", "steps")
