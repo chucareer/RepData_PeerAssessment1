@@ -26,6 +26,8 @@ barplot(DailyTotalSteps$steps, names.arg = DailyTotalSteps$date,
     main = "Total Number of Steps Taken Each Day", axis.lty = 1)
 ```
 
+![Figure1](https://github.com/chucareer/RepData_PeerAssessment1/blob/master/Figure%201.png)
+
 ### Mean and median of step taken each day
 ```{r, echo = FALSE}
 MeanValue <- mean(DailyTotalSteps$steps, na.rm = TRUE)
