@@ -46,6 +46,8 @@ plot(AverageSteps$interval, AverageSteps$steps, type = "l",
     main = "Average number of steps taken by 5-minute interval")
 ```
 
+![Figure2](https://github.com/chucareer/RepData_PeerAssessment1/blob/master/Figure%202.png)
+
 ### 5-minute interval with maximum number of steps
 ```{r, echo = FALSE}
 Interval_maxvalue <- AverageSteps$interval[AverageSteps$steps == max(AverageSteps$steps)]
@@ -76,6 +78,8 @@ barplot(ImputTotalSteps$steps, names.arg = ImputTotalSteps$date,
     main = "Total Number of Steps Taken Each Day after imputing", 
     axis.lty = 1)
 ```
+
+![Figure3](https://github.com/chucareer/RepData_PeerAssessment1/blob/master/Figure%203.png)
 
 ### Mean and median of step taken each day with imputing data
 ```{r, echo = FALSE}
@@ -122,7 +126,10 @@ WeekdayData$steps <- format(WeekdayData$steps, scientific = FALSE)
 library(lattice)
 xyplot(as.integer(steps) ~ interval | weekday, data = WeekdayData, layout = c(1, 2),
        type = "l", xlab = "Interval", ylab = "Number of steps")
-
 ```
+
+![Figure4](https://github.com/chucareer/RepData_PeerAssessment1/blob/master/Figure%204.png)
+
+
 It is diffent in activity patterns between weekdays and weekends.
 
